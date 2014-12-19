@@ -62,11 +62,6 @@ void display() {
   glMatrixMode (GL_PROJECTION);                     
   glLoadIdentity ();        
 
-  float m = 1;
-  xPos += m * xVel;
-  yPos += m * yVel;
-
-
   // vector2f c(0.4, 0);
   // vector2f p0(0,0);
   // vector2f vec(p1.x, p1.y); 
@@ -88,96 +83,42 @@ void display() {
   */
 
 
-  // Reflection test
-  /*
-  vec2 l0(-0.4, 0);
-  vec2 l1( 0.4, 0);
+  float m = 1;
+  xPos += m * xVel;
+  yPos += m * yVel;
 
-  vec2 refl = p1.reflectedIn(l0, l1); 
+  vec2 c(xPos,yPos);
 
-  drawLineSegment(l0, l1);
-  drawLineSegment(refl, vec2(0,0));
-  drawLineSegment(p1, vec2(0,0));
-  */
+  for (wall * w : ws) { w->draw(); }
 
-  // Reflection test 2
-  vec2 l0(p1.x, p1.y);
-  vec2 l1(-p1.x, -p1.y);
-  vec2 q(0.2, 0.3);
+  for (int i = 0; i < 6; i++) { 
 
-  vec2 refl = q.reflectedIn(l0, l1); 
+    vec2 o;
 
-  drawLineSegment(l0, l1);
-  drawLineSegment(refl, vec2(0,0));
-  drawLineSegment(q, vec2(0,0));
-  
-  
+    wall w(ws[i]->p1, ws[i]->p0); 
+    // wall w(ws[i]->p0, ws[i]->p1); 
 
-  // glBegin(GL_LINES);
-  
-  // glVertex3f(p0.x, p0.y, 0);
-  // glVertex3f(p1.x, p1.y, 0);
+    bool b = w.collision(c, r, o);
 
-  // glVertex3f(p0.x, p0.y, 0);
-  // glVertex3f(c.x, c.y, 0);
-
-  // glVertex3f(p0.x, p0.y - 0.01, 0);
-  // glVertex3f(mv.x, mv.y - 0.01, 0);
-
-  // glEnd();
-
-
-  // vec2 c(0.4, 0);
-  // vec2 p0(0, 0); 
-  // vec2 mv_ (p1.x, 0); 
-
-  // float q = dot(c, p1) / p1.magnitude2(); 
-  // vec2 mv = c.scale(1/q);
-
-// vec2 projectionOn (vec2 b, vec2 a) { 
-//   float q = dot(a,b) / a.magnitude2();
-//   return a.scale(q); 
-// }
-
-  // vec2 mv = projectionOn(p1, vec2(0.5, 0)); 
-  
-  // // printf ("actual = %f , attempted = %f \n", mv_.x, mv.x); 
-
-
-  // vec2 q0(0.5, 0);
-  // vec2 q1(0.3, 0.2);
-  // vec2 mv = projectionOn(q0, q1); 
-  
-
-
-
-  // vec2 c(xPos,yPos);
-
-  // for (wall* w : ws) { 
-  //   w->draw(); 
-  // }
-
-  // int i = 0;
-  // for (wall* w : ws) { 
-  //   vec2 o;
-
-  //   bool b = w->collision(c, r, o);
-
-  //   printf ("\n %d: ", i); 
+    if (b) {
+      printf ("Collision. %f %f \n", xVel , yVel);
       
-  //   if (b) {
-  //     vec2 vel(xVel, yVel);
-  //     vel = vel.reflect(w->p0, w->p1);
-  //     xVel = vel.x;
-  //     yVel = vel.y;
-  //     break;
-  //   }
-  //   i++;
-  // }
-  
-  // drawPaddle (c, r); 
+      xPos -= m * xVel;
+      yPos -= m * yVel;
 
-  // glutSolidTeapot(1); 
+      vec2 vel(xVel, yVel);
+      vel = vel.reflectedIn(w.p0, w.p1);
+      xVel = vel.x;
+      yVel = vel.y;
+
+      xPos += m * xVel;
+      yPos += m * yVel;
+      break; 
+    } 
+  }
+
+  drawPaddle (c, r); 
+
 
   glutSwapBuffers();
   glutPostRedisplay ();

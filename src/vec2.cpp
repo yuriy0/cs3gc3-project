@@ -68,8 +68,8 @@ void vec2::ap(std::function<void(float, float)> fn) {
 
 vec2 vec2::reflectedIn (vec2 a, vec2 b) {
   vec2 d = a - b;
-  // vec2 q(-d.y, d.x); 
-  return reflectedIn(d);
+  vec2 q(-d.y, d.x); 
+  return reflectedIn(q);
 }
 
 vec2 vec2::reflectedIn (vec2 n) { 
