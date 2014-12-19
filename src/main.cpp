@@ -64,41 +64,34 @@ void display() {
   glMatrixMode (GL_PROJECTION);                     
   glLoadIdentity ();        
 
-  // vector2f c(0.4, 0);
-  // vector2f p0(0,0);
-  // vector2f vec(p1.x, p1.y); 
-
-  // vector2f mv = vec.projected(c); 
-
-
-  // Projection test 
-  /*
-  vec2 c(0.4, 0);
-  vec2 p0(0,0);
-  vec2 vec(p1.x, p1.y); 
-
-  vec2 mv = vec.projectedOn(c); 
-
-  drawLineSegment(p0, c);
-  drawLineSegment(p0, vec); 
-  drawLineSegment(vec2(0,-0.01) , mv - vec2(0, 0.01)); 
-  */
-
 
   float m = 1;
-  c0.c = c0.c + c0.v.scale(m);
 
   for (wall * w : ws) { w->draw(); }
-  for (circle * c : cs) { c->draw(); }
+  for (circle * c : cs) { 
+    c->draw(); 
+    c->c = c->c + c->v.scale(m);
+  }
 
   bool collided[3]; 
 
   for (int i = 0; i < 3; i++) { 
     for (int j = 0; j < 3; j++) { 
-      if (!collided[i] && !collided[j]) { 
-	if (collision(cs[i], cs[j])) {
+      circle * a = cs[i];
+      circle * b = cs[j];
+
+      if (i != j && !collided[i] && !collided[j]) { 
+	if (circle::collision(*a, *b)) {
+	  a->c = a->c - a->v.scale(m);
+	  b->c = b->c - b->v.scale(m);
+
+	  printf ("%d, %d collided \n", i, j); 
+
+	  circle::performCollision(*a, *b, 1, 1); 
+
+	  a->c = a->c + a->v.scale(m);
+	  b->c = b->c + b->v.scale(m);
 	  collided[i] = collided[j] = true; 
-	  performCollision(cs[i], cs[j], 1); 
 	  
 	}
       }
@@ -109,6 +102,7 @@ void display() {
 
 
   // for (int i = 0; i < 6; i++) { 
+    
   //   vec2 o;
   //   wall w = *ws[i];
   //   bool b = w.collision(c0.c, c0.r, o);
@@ -136,6 +130,8 @@ void display() {
 
 
 int main(int argc, char** argv) {
+
+  c1.v = c2.v = vec2(0.001, 0.001); 
 
   float m = 0.8; 
   for (int i = 0; i < 6; i++) { 
