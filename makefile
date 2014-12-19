@@ -4,7 +4,7 @@ CFLAGS= -pedantic -Wall -std=c++11 -pthread -DMODE_$(MODE)
 LDFLAGS= -lGL -lGLU -lglut1
 SRCDIR=src
 EXE = cs3gc3-final
-FILES = vec2 wall utils drawing main 
+FILES = vec2 wall utils drawing main circle 
 PWDCMD = pwd
 
 ifeq "$(OS)" "Windows_NT"

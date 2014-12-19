@@ -6,17 +6,19 @@
 #include "wall.h"
 #include "math.h"
 #include "drawing.h"
+#include "circle.h"
 
 #include <GL/gl.h> 
 #include <GL/glu.h> 
 #include <GL/glut.h> 
 
 
-float xPos, yPos; 
-float xVel, yVel; 
-float r = 0.05; 
-
 wall * ws[6]; 
+circle c0(vec2(0,0), 0.05);
+circle c1(vec2(0.3,0.3), 0.05);
+circle c2(vec2(-0.2,-0.1), 0.05);
+
+circle * cs[] = { &c0, &c1, &c2 }; 
 
 
 vec2 p1(0, 0); 
@@ -30,16 +32,16 @@ void keyboard (unsigned char a, int b, int c) {
 void specialKey (int key, int b, int c) {  
   switch(key) {
   case GLUT_KEY_UP:    
-    yVel += 0.001;
+    c0.v.y += 0.001;
     break;
   case GLUT_KEY_DOWN:  
-    yVel -= 0.001;
+    c0.v.y -= 0.001;
     break;
   case GLUT_KEY_LEFT:  
-    xVel -= 0.001;
+    c0.v.x -= 0.001;
     break;
   case GLUT_KEY_RIGHT: 
-    xVel += 0.001; 
+    c0.v.x += 0.001; 
     break;
   default:
     return; 
@@ -84,40 +86,27 @@ void display() {
 
 
   float m = 1;
-  xPos += m * xVel;
-  yPos += m * yVel;
-
-  vec2 c(xPos,yPos);
+  c0.c = c0.c + c0.v.scale(m);
 
   for (wall * w : ws) { w->draw(); }
+  for (circle * c : cs) { c->draw(); }
 
   for (int i = 0; i < 6; i++) { 
-
     vec2 o;
-
-    wall w(ws[i]->p1, ws[i]->p0); 
-    // wall w(ws[i]->p0, ws[i]->p1); 
-
-    bool b = w.collision(c, r, o);
+    wall w = *ws[i];
+    bool b = w.collision(c0.c, c0.r, o);
 
     if (b) {
-      printf ("Collision. %f %f \n", xVel , yVel);
-      
-      xPos -= m * xVel;
-      yPos -= m * yVel;
+      c0.c = c0.c - c0.v.scale(m);
 
-      vec2 vel(xVel, yVel);
+      vec2 vel(c0.v.x, c0.v.y);
       vel = vel.reflectedIn(w.p0, w.p1);
-      xVel = vel.x;
-      yVel = vel.y;
+      c0.v = vel;
 
-      xPos += m * xVel;
-      yPos += m * yVel;
+      c0.c = c0.c + c0.v.scale(m);
       break; 
     } 
   }
-
-  drawPaddle (c, r); 
 
 
   glutSwapBuffers();
