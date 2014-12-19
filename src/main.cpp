@@ -91,22 +91,42 @@ void display() {
   for (wall * w : ws) { w->draw(); }
   for (circle * c : cs) { c->draw(); }
 
-  for (int i = 0; i < 6; i++) { 
-    vec2 o;
-    wall w = *ws[i];
-    bool b = w.collision(c0.c, c0.r, o);
+  bool collided[3]; 
 
-    if (b) {
-      c0.c = c0.c - c0.v.scale(m);
-
-      vec2 vel(c0.v.x, c0.v.y);
-      vel = vel.reflectedIn(w.p0, w.p1);
-      c0.v = vel;
-
-      c0.c = c0.c + c0.v.scale(m);
-      break; 
-    } 
+  for (int i = 0; i < 3; i++) { 
+    for (int j = 0; j < 3; j++) { 
+      if (!collided[i] && !collided[j]) { 
+	if (collision(cs[i], cs[j])) {
+	  collided[i] = collided[j] = true; 
+	  performCollision(cs[i], cs[j], 1); 
+	  
+	}
+      }
+    }
   }
+  
+
+
+
+  // for (int i = 0; i < 6; i++) { 
+  //   vec2 o;
+  //   wall w = *ws[i];
+  //   bool b = w.collision(c0.c, c0.r, o);
+
+  //   if (b) {
+  //     c0.c = c0.c - c0.v.scale(m);
+
+  //     vec2 vel(c0.v.x, c0.v.y);
+  //     vel = vel.reflectedIn(w.p0, w.p1);
+  //     c0.v = vel;
+
+  //     c0.c = c0.c + c0.v.scale(m);
+  //     break; 
+  //   } 
+  // }
+
+
+
 
 
   glutSwapBuffers();
