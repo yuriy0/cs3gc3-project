@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   glutInitWindowSize(800, 800);
   glutInitWindowPosition(50, 50);
   
-  glutCreateWindow("final project - Yuriy Toporovskyy");      
+  glutCreateWindow("CS3GC3 - Final project - Yuriy Toporovskyy, Mostapha Mohammed");      
 
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);  
