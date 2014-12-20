@@ -1,0 +1,17 @@
+Final project - Yuriy Toporovskyy, Mostapha Mohammed
+
+A table hockey game where you play against multiple computers!
+Everyone starts with 20 lives. If you reach 0, you lose. 
+
+Functionality: 
+- Drag with LMB: move your paddle.
+
+- [N/n] : New game
+
+- [1..3] : New game and select difficulty.
+
+- [P/s] : Pause and unpause
+
+- [Q/q/ESC] : Quit game
+
+- Right click menu: Provides new game, pause and unpause functionality as well.
