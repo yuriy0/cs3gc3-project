@@ -1,0 +1,79 @@
+#include "drawing.h"
+#include "circle.h"
+#include "math.h"
+
+
+circle::circle (vec2 c_, float r_) : c(c_), r(r_), m(1) { }
+circle::circle (vec2 c_, float r_, float m_) : c(c_), r(r_), m(m_) { }
+
+void circle::draw () { 
+  drawPaddle(c, r);
+}
+
+
+bool circle::collision (circle& a, circle& b) {
+  float dist2 = (a.c - b.c).magnitude2(); 
+  float r = a.r + b.r; 
+  float r2 = r*r; 
+  
+  return dist2 < r2;
+}
+
+
+void circle::step(float delta) { 
+  c = c + v.scale(delta);
+}
+
+// http://farside.ph.utexas.edu/teaching/301/lectures/node76.html
+void circle::performCollision (circle& a, circle& b, float delta) {
+  a.v.scale(delta);
+  b.v.scale(delta);
+
+  vec2 colPlane = a.c - b.c; 
+  vec2 colPlaneO(-colPlane.y, colPlane.x); 
+
+  vec2 aVP = a.v.projectedOn(colPlane); 
+  vec2 aVC = a.v.projectedOn(colPlaneO);
+
+  vec2 bVP = b.v.projectedOn(colPlane); 
+  vec2 bVC = b.v.projectedOn(colPlaneO);
+
+  float mSum = a.m + b.m;
+  float mDiff = (a.m - b.m) / mSum; 
+  float aMr = 2 * a.m / mSum;
+  float bMr = 2 * b.m / mSum; 
+
+  vec2 aVPF = aVP.scale(mDiff) + bVP.scale(bMr  );
+  vec2 bVPF = aVP.scale(aMr  ) - bVP.scale(mDiff);
+
+  a.v = aVC + aVPF;
+  b.v = bVC + bVPF; 
+
+  a.v.scale(1 / delta);
+  b.v.scale(1 / delta);
+}    
+
+
+  // vec2 aV = a.v.reflectedIn(colPlane); 
+  // vec2 bV = b.v.reflectedIn(colPlane); 
+
+  // a.v = aV;
+  // b.v = bV; 
+
+// void circle::performCollision (circle& a, circle& b, float r, float delta) {
+
+//   a.v.scale(delta);
+//   b.v.scale(delta);
+
+//   collision2Ds(a.m, b.m, 
+// 	       r,
+// 	       a.c.x, a.c.y,
+// 	       b.c.x, b.c.y,
+// 	       a.v.x, a.v.y,
+// 	       b.v.x, a.v.x
+// 	       ); 
+
+//   a.v.scale(1 / delta);
+//   b.v.scale(1 / delta);
+
+// }    
