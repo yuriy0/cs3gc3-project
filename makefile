@@ -7,6 +7,7 @@ FILES = vec2 wall utils drawing main circle state
 PWDCMD = pwd 
 
 ifeq "$(OS)" "Windows_NT"
+    EXE =  cs3gc3-final.exe
     LDFLAGS = -lglut32 -lglu32 -lopengl32
     PWDCMD = cmd /c cd
 endif
@@ -27,4 +28,4 @@ clean:
 	rm ./$(EXE)
 
 zip: 
-	zip -r cs3gc3_final_project_y.toporovskyy_m.mohammed.zip makefile readme src/*.h src/*.cpp images/*
+	zip -r cs3gc3_final_project_y.toporovskyy_m.mohammed.zip makefile readme src/*.h src/*.cpp images/* $(EXE)
