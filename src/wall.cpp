@@ -15,7 +15,35 @@ wall::wall(vec2 p0_, vec2 p1_) : p0(p0_), p1(p1_) { }
 wall::wall(float a, float b, float c, float d) : p0(a,b), p1(c,d) { } 
 
 void wall::draw() { 
-  drawLineSegment(p0, p1); 
+  vec2 m = (p0 + p1).scale(0.5); 
+
+  vec2 ux = vec2(1, 0);
+  vec2 diff = p0 - p1;
+  float al = angle(ux, diff); 
+
+  if (diff.x > 0) { 
+    if (diff.y > 0) { 
+      al = al;
+    } else { 
+      al = -al;
+    }
+  } else {
+    if (diff.y > 0) { 
+      al = al;
+    } else { 
+      al = -al;
+    }
+  }
+
+  glPushMatrix();
+  glTranslatef( m.x, m.y, 0); 
+
+  glRotatef( 180 * al / PI, 0, 0, 1);
+
+  glScalef( diff.magnitude() , 0.01, 0.1 );
+
+  glutSolidCube(1);
+  glPopMatrix(); 
 }
 
 

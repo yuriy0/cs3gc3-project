@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <functional>
 #include "vec2.h"
 
 enum CircleType { Puck, Paddle } ; 
@@ -16,6 +17,7 @@ public:
   vec2 v = vec2(0,0); 
   CircleType ty; 
 
+  void init();
   void draw(); 
   void step(float);
   static bool collision (circle&, circle&); 

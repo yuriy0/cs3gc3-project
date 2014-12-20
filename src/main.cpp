@@ -21,7 +21,14 @@ int main(int argc, char** argv) {
   
   glutCreateWindow("final project - Yuriy Toporovskyy");      
 
+  glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);  
+  glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_NORMALIZE); 
+  glEnable( GL_TEXTURE_2D );
+
+  st.texture = loadTextureRAW("images/Ice.rgb", true); 
+
 
   // Set up all callback functions.
   glutKeyboardFunc      ([] (unsigned char a, int b, int c) { st.keyboard(a,b,c);         });

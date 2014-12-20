@@ -9,7 +9,14 @@
 
 using namespace std; 
 
-state::state(int n) : numPlayers(n) { init(); }
+state::state(int n) : numPlayers(n) { 
+  init(); 
+  
+  // texture = loadTextureRAW("../images/Ice.rgb", true); 
+  // texture = loadTextureRAW("texture.raw", true); 
+  // texture = loadTextureRAW("texture.raw", true); 
+  // printf ("texture %d \n", texture); 
+}
 
 state::state() : state(3) { } 
 
@@ -182,20 +189,51 @@ void state::reshape(int w, int h) {
   glutReshapeWindow(width, height);
 }
 
+// Values for the lights. 
+const float ambientLight[] =  { 0.5 , 0.5 , 0.5 , 1 };
+const float diffuseLight[] =  { 0.3 , 0.3 , 0.3 , 1 }; 
+const float specularLight[] = { 0.4 , 0.4 , 0.4 , 1 };
+const float emissionLight[] = { 0.2 , 0.2 , 0.2 , 1 };
+const float position[] = {0,0, -1, 1};
+
+void state::setupLight (int n) { 
+  // According the openGL implementation, GL_LIGHTi = GL_LIGHT0 + i.
+  glEnable(GL_LIGHT0 + n); 
+
+  // Set all the light parameters.
+  glLightfv(GL_LIGHT0 + n, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT0 + n, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT0 + n, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT0 + n, GL_EMISSION, emissionLight);
+
+  // Position the light at the position corresponding to that light in
+  // the state.
+  glPushMatrix(); 
+  // glTranslatef(dxl[n-1], dyl[n-1], 0); 
+
+  glLightfv(GL_LIGHT0 + n, GL_POSITION, position);
+  glPopMatrix(); 
+}
+
 void state::display() { 
   // clear buffers
+  glClearColor(0.6,0.6,0.7,1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   float sq = fmin(height, width); 
   glViewport (0, 0, sq, sq);      
 
+  
+  glColor3f(0, 0, 0);
+  glDisable(GL_LIGHTING);
   // Text for score etc 
   float yPos = 0.95;
+  float xPos = 0.7;
   glPushMatrix();
   glLoadIdentity();
 
   for (int i = 0; i < numPlayers; i++) {
-    glRasterPos2f(0.95, yPos); yPos -= 0.05;
+    glRasterPos2f(xPos, yPos); yPos -= 0.05;
     ostringstream s;
     s << i << " : " << score[i];  
     string str = s.str();
@@ -210,7 +248,7 @@ void state::display() {
   if (!gameStarted) {
     glPushMatrix();
     glLoadIdentity();
-    glRasterPos2f(0.95, yPos);
+    glRasterPos2f(xPos, yPos);
 
     string str = "Paused";
     
@@ -220,23 +258,81 @@ void state::display() {
     glPopMatrix();
   }
 
-  // reset model view 
-  glMatrixMode (GL_MODELVIEW);                     
-  glLoadIdentity ();       
-  
   // Draw the colour ramp scale 
   // Clear the projection matrix
   glMatrixMode (GL_PROJECTION);                     
   glLoadIdentity ();              
 
+  // reset model view 
+  glMatrixMode (GL_MODELVIEW);                     
+  glLoadIdentity ();       
+  
+  float q = 0.5;
+  glScalef(q, q, q); 
+
+  // Enable the lights.
+  setupLight(1);
+  
+  gluPerspective(50, 1, 0.1, 100); 
+
+  // Set the camera to look at the origin
+  gluLookAt(0, 0,  1,
+  	    0, 0,  0,
+  	    0, 1,  0);
+
+
+  glTranslatef(0, 0.1, 0); 
+
+
+  glRotatef(-30, 1, 0, 0);
+
+
+  glEnable(GL_LIGHTING);
+
+  glBindTexture( GL_TEXTURE_2D, texture );
+  glEnable(GL_TEXTURE_2D);
+
+  glColor3f(1, 1, 1);
+  glBegin( GL_POLYGON );
+  for (int i = 0; i < 2*numPlayers; i++) {
+    float al = i * PI / numPlayers; 
+    float xc = fieldRadius * cosf(al);
+    float yc = fieldRadius * sinf(al);
+    glTexCoord3d(xc, yc, -0.05); glVertex3d(xc, yc, -0.05); 
+  }
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
+
+
+  // Tell openGL to use the normals we specify as materials. 
+  glColorMaterial(GL_FRONT_AND_BACK, 
+		  GL_AMBIENT
+		  // GL_AMBIENT_AND_DIFFUSE
+		  );
+
+  // Enable the above. 
+  glEnable(GL_COLOR_MATERIAL);
+
+
+  glColor3f(1, 1, 1);
   for (wall & w : ws) { w.draw(); }
 
   glColor3f(0.3, 0.3, 0.3);
-  for (wall & iw : iws) { iw.draw(); }
+  // for (wall & iw : iws) { iw.draw(); }
+  for (wall & iw : iws) { 
+    drawLineSegment(iw.p0, iw.p1); 
+  }
   for (wall & gw : gws) { gw.draw(); }
-  glColor3f(1, 1, 1);
 
-  for (circle & c : cs) { c.draw(); }
+  for (int j = 0; j < cs.size(); j++) {
+    if (j == playerPaddle) { glColor3f (1, 0, 0); } 
+    else { glColor3f (0, 0, 1); }
+    cs[j].draw();
+  }
+  // for (circle & c : cs) { c.draw(); }
+
+  glColor3f (1, 0.5, 0);
 
   puck.draw(); 
 

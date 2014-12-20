@@ -1,14 +1,35 @@
 #include "drawing.h"
 #include "circle.h"
 #include "math.h"
+#include <functional>
+#include "utils.h"
 
+#include <GL/gl.h> 
+#include <GL/glu.h> 
+#include <GL/glut.h> 
 
-circle::circle (CircleType ty_, vec2 c_, float r_) : c(c_), r(r_), m(1), ty(ty_) { }
-circle::circle (CircleType ty_, vec2 c_, float r_, float m_) : c(c_), r(r_), m(m_), ty(ty_) { }
-circle::circle (CircleType ty_) : ty(ty_) { } 
+using namespace std; 
+
+circle::circle (CircleType ty_, vec2 c_, float r_) : c(c_), r(r_), m(1), ty(ty_) { 
+  init();
+}
+
+circle::circle (CircleType ty_, vec2 c_, float r_, float m_) : c(c_), r(r_), m(m_), ty(ty_) { 
+  init();
+}
+
+circle::circle (CircleType ty_) : ty(ty_) { 
+  init();
+} 
 
 void circle::draw () { 
-  drawPaddle(c, r);
+  glPushMatrix();
+  glTranslatef(c.x, c.y, 0);
+  glutSolidSphere(r, 20, 20);
+  glPopMatrix(); 
+}
+
+void circle::init() {  
 }
 
 
@@ -53,3 +74,5 @@ void circle::performCollision (circle& a, circle& b, float delta) {
   a.v.scale(1 / delta);
   b.v.scale(1 / delta);
 }    
+
+

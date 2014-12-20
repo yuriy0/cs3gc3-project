@@ -1,5 +1,10 @@
 #pragma once 
 
+#include <GL/gl.h> 
+#include <GL/glu.h> 
+#include <GL/glut.h> 
+#include <stdio.h>
+
 /** Various RNG helper functions */
 float randF () ;
 float randF (float a, float b) ;
@@ -8,9 +13,7 @@ int randI (int a, int b) ;
 int min(int a, int b);
 int max(int a, int b); 
 
-enum DrawMode { Wire, Surface, WireAndSurface, HeightMap }; 
-
-const char* drawModeName (DrawMode); 
+GLuint loadTextureRAW( const char * , bool );
 
 int mod (int, int);  
 

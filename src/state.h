@@ -26,7 +26,7 @@ const float fieldRadius = 0.8;
 const float frictionCoefficient = 0.09; 
 const float gateSize = 0.2; 
 
-const int initialScore = 1; 
+const int initialScore = 20; 
 
 class state { 
 public:
@@ -42,11 +42,12 @@ public:
   circle puck = circle(Puck, vec2(0,0), puckRadius); 
   vec2 p1; 
   bool lmbPressed = false; 
-  int width = 750; 
+  int width = 700; 
   int height = 700;
   int playerPaddle = 0; 
   int time = 0;
   bool gameStarted = false; 
+  GLuint texture; 
 
   // OpenGL handlers 
   void keyboard (unsigned char, int, int);
@@ -65,6 +66,9 @@ public:
   void collideWithWalls (vector<circle> &, vector<wall> &, float); 
   void stepAI (float, float, int, circle &);
   void resetPuck();
+
+
+  void setupLight (int);
 
   void startGame(); 
   void pauseGame(); 
