@@ -19,6 +19,13 @@ void state::resetPuck() {
 }
 
 void state::init() { 
+  gameStarted = false; 
+  cs.clear();
+  ws.clear();
+  iws.clear(); 
+  gws.clear();
+  score.clear(); 
+
   resetPuck();
   p1 = vec2(0,0);
   wall::genInitial(numPlayers, fieldRadius, paddleRadius, gateSize, cs, ws, iws, gws);
@@ -50,6 +57,8 @@ void state::stepAI (float m, float diff, int i, circle & c) {
 }
 
 void state::mouseMoved (int a, int b) {
+  if (!gameStarted) return; 
+
   float dx = (a - p1.x) / width;
   float dy = (p1.y - b) / height;
 
@@ -68,7 +77,7 @@ void state::passiveMouseMoved (int b, int c) {
 }
 
 void state::mousePressed (int button, int state, int x, int y) {
-  if (button == GLUT_LEFT_BUTTON) {
+  if (button == GLUT_LEFT_BUTTON && gameStarted) {
     lmbPressed = state == GLUT_DOWN; 
   } 
 }
@@ -141,6 +150,8 @@ void state::step(float m) {
 
 
 void state::step() { 
+  if (!gameStarted) return; 
+
   // Compute the time since the last invocation of step
   int t = glutGet(GLUT_ELAPSED_TIME);
   int dt_ = t - time;
@@ -214,9 +225,29 @@ void state::display() {
   for (circle & c : cs) { c.draw(); }
 
   puck.draw(); 
-  
-
 
   glutSwapBuffers();
   glutPostRedisplay ();
+}
+
+
+void state::menuHandler(int i) { 
+  switch (i) { 
+  case 0: startGame(); break;
+  case 1: pauseGame(); break;
+  case 2: newGame(); break;
+  }
+}
+
+void state::startGame() {
+  gameStarted = true;
+}
+
+void state::pauseGame() { 
+  gameStarted = false; 
+}
+
+void state::newGame() { 
+  gameStarted = false; 
+  init(); 
 }

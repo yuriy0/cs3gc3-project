@@ -33,6 +33,14 @@ int main(int argc, char** argv) {
   glutReshapeFunc       ([] (int a, int b)                  { st.reshape(a,b);            }); 
   glutIdleFunc          ([] ()                              { st.step();                  });
   
+    
+  // Main menu.
+  glutCreateMenu ([] (int i) { st.menuHandler(i); });
+  glutAddMenuEntry("Start game", 0);
+  glutAddMenuEntry("Pause game", 1);
+  glutAddMenuEntry("New game", 2);
+  glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 
   glutMainLoop();				
   return(0);

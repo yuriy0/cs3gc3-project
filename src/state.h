@@ -46,6 +46,7 @@ public:
   int height = 700;
   int playerPaddle = 0; 
   int time = 0;
+  bool gameStarted = false; 
 
   // OpenGL handlers 
   void keyboard (unsigned char, int, int);
@@ -64,6 +65,10 @@ public:
   void collideWithWalls (vector<circle> &, vector<wall> &, float); 
   void stepAI (float, float, int, circle &);
   void resetPuck();
-  
+
+  void startGame(); 
+  void pauseGame(); 
+  void newGame(); 
+  void menuHandler(int);
 
 };
