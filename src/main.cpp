@@ -6,10 +6,6 @@
 #include <vector>
 #include "state.h"
 
-#include <GL/gl.h> 
-#include <GL/glu.h> 
-#include <GL/glut.h> 
-
 using namespace std;
 
 state st;
@@ -20,7 +16,7 @@ int main(int argc, char** argv) {
   glutInit(&argc, argv);		
   glutInitDisplayMode(GLUT_ALPHA | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE | GLUT_DEPTH );
 
-  glutInitWindowSize(600, 600);
+  glutInitWindowSize(800, 800);
   glutInitWindowPosition(50, 50);
   
   glutCreateWindow("final project - Yuriy Toporovskyy");      
@@ -34,7 +30,9 @@ int main(int argc, char** argv) {
   glutMouseFunc         ([] (int a, int b, int c, int d)    { st.mousePressed(a,b,c,d);   });
   glutMotionFunc        ([] (int a, int b)                  { st.mouseMoved(a,b);         }); 
   glutPassiveMotionFunc ([] (int a, int b)                  { st.passiveMouseMoved(a,b);  }); 
- 
+  glutReshapeFunc       ([] (int a, int b)                  { st.reshape(a,b);            }); 
+  glutIdleFunc          ([] ()                              { st.step();                  });
+  
 
   glutMainLoop();				
   return(0);

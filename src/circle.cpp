@@ -3,8 +3,9 @@
 #include "math.h"
 
 
-circle::circle (vec2 c_, float r_) : c(c_), r(r_), m(1) { }
-circle::circle (vec2 c_, float r_, float m_) : c(c_), r(r_), m(m_) { }
+circle::circle (CircleType ty_, vec2 c_, float r_) : c(c_), r(r_), m(1), ty(ty_) { }
+circle::circle (CircleType ty_, vec2 c_, float r_, float m_) : c(c_), r(r_), m(m_), ty(ty_) { }
+circle::circle (CircleType ty_) : ty(ty_) { } 
 
 void circle::draw () { 
   drawPaddle(c, r);
@@ -52,28 +53,3 @@ void circle::performCollision (circle& a, circle& b, float delta) {
   a.v.scale(1 / delta);
   b.v.scale(1 / delta);
 }    
-
-
-  // vec2 aV = a.v.reflectedIn(colPlane); 
-  // vec2 bV = b.v.reflectedIn(colPlane); 
-
-  // a.v = aV;
-  // b.v = bV; 
-
-// void circle::performCollision (circle& a, circle& b, float r, float delta) {
-
-//   a.v.scale(delta);
-//   b.v.scale(delta);
-
-//   collision2Ds(a.m, b.m, 
-// 	       r,
-// 	       a.c.x, a.c.y,
-// 	       b.c.x, b.c.y,
-// 	       a.v.x, a.v.y,
-// 	       b.v.x, a.v.x
-// 	       ); 
-
-//   a.v.scale(1 / delta);
-//   b.v.scale(1 / delta);
-
-// }    

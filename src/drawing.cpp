@@ -27,6 +27,9 @@ void drawPaddle(vec2 c, float r) {
   glEnd();
 }
 
+void drawPuck(vec2 c, float r) { 
+  drawPaddle(c, r);
+}
 
 #elif MODE_RELEASE
 

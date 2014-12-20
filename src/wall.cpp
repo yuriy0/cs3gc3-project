@@ -83,7 +83,7 @@ void wall::genInitial (int i, float rField, float rPaddle, float goalSize,
 
     wall solidWall (p1, p2) ; 
     wall toMiddle (m1, vec2(0,0)); 
-    circle circ (m0.scale(0.8), rPaddle); 
+    circle circ (Paddle, m0.scale(0.8), rPaddle); 
 
     wall side1(p0,g0); 
     wall side2(g1,p1);

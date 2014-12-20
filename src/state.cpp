@@ -1,20 +1,31 @@
-
 #include "state.h"
 
-state::state(int n) : numPlayers(n) { 
-  resetPuck();
-  p1 = vec2(0,0);
-  wall::genInitial(numPlayers, fieldRadius, paddleRadius, gateSize, cs, ws, iws, gws);
-  for (int i = 0; i<numPlayers; i++) { 
-    score.push_back(0); 
-  }
-}
+#include <iostream>    
+#include <sstream>      
+
+#include <GL/gl.h> 
+#include <GL/glu.h> 
+#include <GL/glut.h> 
+
+using namespace std; 
+
+state::state(int n) : numPlayers(n) { init(); }
 
 state::state() : state(3) { } 
 
 void state::resetPuck() { 
-  puck = circle(vec2(0,0), puckRadius); 
+  puck = circle(Puck, vec2(0,0), puckRadius); 
   puck.m = 0.3; 
+}
+
+void state::init() { 
+  resetPuck();
+  p1 = vec2(0,0);
+  wall::genInitial(numPlayers, fieldRadius, paddleRadius, gateSize, cs, ws, iws, gws);
+  for (int i = 0; i<numPlayers; i++) { 
+    score.push_back(initialScore); 
+  }
+  playerPaddle = numPlayers - 1; 
 }
 
 void state::keyboard (unsigned char a, int b, int c) { 
@@ -39,14 +50,14 @@ void state::stepAI (float m, float diff, int i, circle & c) {
 }
 
 void state::mouseMoved (int a, int b) {
-  float dx = (a - p1.x) / (600);
-  float dy = (p1.y - b) / (600);
+  float dx = (a - p1.x) / width;
+  float dy = (p1.y - b) / height;
 
   if (lmbPressed) {
-    cs[0].v.x += 0.07 * dx;
-    cs[0].v.y += 0.07 * dy;
-
+    cs[playerPaddle].v.x += 0.09 * dx;
+    cs[playerPaddle].v.y += 0.09 * dy;
   }
+
   p1.x = a;
   p1.y = b;
 }
@@ -60,100 +71,44 @@ void state::mousePressed (int button, int state, int x, int y) {
   if (button == GLUT_LEFT_BUTTON) {
     lmbPressed = state == GLUT_DOWN; 
   } 
-
-  // if (state == GLUT_DOWN) { 
-  //   lmbPressed = true;
-  // }
-
-  // if(state != GLUT_DOWN) return;
- 
-  // float window_width = glutGet(GLUT_WINDOW_WIDTH);
-  // float window_height = glutGet(GLUT_WINDOW_HEIGHT);
- 
-  // unsigned int index;
-  // glReadPixels(x, window_height - y - 1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
- 
-  // printf ("Stencil at %d %d : %d \n", x, y, index); 
 }
 
-void state::specialKey (int key, int b, int c) {  
-  // switch(key) {
-  // case GLUT_KEY_UP:    
-  //   cs[0].v.y += 0.001;
-  //   break;
-  // case GLUT_KEY_DOWN:  
-  //   cs[0].v.y -= 0.001;
-  //   break;
-  // case GLUT_KEY_LEFT:  
-  //   cs[0].v.x -= 0.001;
-  //   break;
-  // case GLUT_KEY_RIGHT: 
-  //   cs[0].v.x += 0.001; 
-  //   break;
-  // default:
-  //   return; 
-  // }
-}
+void state::specialKey (int key, int b, int c) { }
 
-bool state::collideWithWalls (vector<circle> & cs, vector<wall> & ws, float m) {
-  boolean r = false;
-  for (int j = 0; j < cs.size(); j++) { 
-    for (int i = 0; i < ws.size(); i++) { 
-      vec2 o;
-      bool b = ws[i].collision(cs[j].c, cs[j].r, o);
+int state::collideWithWalls1 (circle & cr, vector<wall> & ws, float m) {
+  for (int i = 0; i < ws.size(); i++) { 
+    vec2 o;
+    bool b = ws[i].collision(cr.c, cr.r, o);
 
-      if (b) {
-  	cs[j].step(-m);
+    if (b) {
+      cr.step(-m);
 
-  	vec2 vel(cs[j].v.x, cs[j].v.y);
-  	vel = vel.reflectedIn(ws[i].p0, ws[i].p1);
-  	cs[j].v = vel;
+      vec2 vel(cr.v.x, cr.v.y);
+      vel = vel.reflectedIn(ws[i].p0, ws[i].p1);
+      cr.v = vel;
 
-  	cs[j].step(m);
-	r = true;
-  	break; 
-      } 
-    }
+      cr.step(m);
+      return i;
+      break; 
+    } 
   }
-  return r; 
+  return -1; 
 }
 
-void state::display() { 
+void state::collideWithWalls (vector<circle> & cs, vector<wall> & ws, float m) {
+  for (int j = 0; j < cs.size(); j++) {
+    collideWithWalls1(cs[j], ws, m); 
+  }
+}
 
-  float m = 1;
-  // clear buffers
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glViewport (0, 0, 600, 600);      
-
-  // reset model view 
-  glMatrixMode (GL_MODELVIEW);                     
-  glLoadIdentity ();       
-  
-  // Draw the colour ramp scale 
-  // Clear the projection matrix
-  glMatrixMode (GL_PROJECTION);                     
-  glLoadIdentity ();              
-
-  for (wall & w : ws) { w.draw(); }
-
-  glColor3f(0.3, 0.3, 0.3);
-  for (wall & iw : iws) { iw.draw(); }
-  for (wall & gw : gws) { gw.draw(); }
-  glColor3f(1, 1, 1);
-
-  cs[0].draw(); 
-  cs[0].step(m);
-
-  for (int i = 1; i < cs.size(); i++) {
-    cs[i].draw(); 
+void state::step(float m) { 
+  for (int i = 0; i < cs.size(); i++) {
     cs[i].step(m);
-    stepAI(m, 0.005, i, cs[i]); 
+    if (i != playerPaddle) stepAI(m, 0.005, i, cs[i]); 
   }
 
-  puck.draw(); 
   puck.step(m); 
-
 
   cs.push_back(puck); 
   bool collided[cs.size()] ; 
@@ -181,22 +136,86 @@ void state::display() {
   cs.pop_back(); 
 
   collideWithWalls(cs, iws, m); 
-  collideWithWalls(cs, gws, m); 
+  collideWithWalls(cs, gws, m);
+}
+
+
+void state::step() { 
+  // Compute the time since the last invocation of step
+  int t = glutGet(GLUT_ELAPSED_TIME);
+  int dt_ = t - time;
+  float dt = 0.001 * (float)dt_; // The time in seconds. 
+  time = t; 
   
-  vector<wall> gwsC (gws); 
-
-  vector<circle> puck_; 
-  puck_.push_back(puck);
-
-  if (collideWithWalls(puck_, gws, m)) { 
-    puck = circle(vec2(0,0), puckRadius);
-    puck.m = 0.3; 
+  float m = 50 * dt; 
+  int steps = 4; 
+  for (int i = 0; i < steps; i++) { 
+    step(m / (float)steps); 
   }
   
+  vector<wall> gwsC (gws); 
+  int si = collideWithWalls1(puck, gwsC, m);
+  if (si != -1) { 
+    resetPuck();
+    score[si] -= 1; 
+    if (score[si] <= 0) init(); 
+  }
+ 
   for (circle & c : cs) { 
     c.v = c.v.scale(0.9); 
   }
   puck.v.scale(0.9); 
+
+}
+
+void state::reshape(int w, int h) {
+  glutReshapeWindow(width, height);
+}
+
+void state::display() { 
+  // clear buffers
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  float sq = fmin(height, width); 
+  glViewport (0, 0, sq, sq);      
+
+  // Text for score etc 
+  glPushMatrix();
+  glLoadIdentity();
+
+  for (int i = 0; i < numPlayers; i++) {
+    glRasterPos2f(0.95, 0.95 - i * 0.05);
+    ostringstream s;
+    s << i << " : " << score[i];  
+    string str = s.str();
+
+    for (int i = 0; i < str.length() ; i++) {
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, str[i]);
+    }
+  }
+  glPopMatrix();
+
+  // reset model view 
+  glMatrixMode (GL_MODELVIEW);                     
+  glLoadIdentity ();       
+  
+  // Draw the colour ramp scale 
+  // Clear the projection matrix
+  glMatrixMode (GL_PROJECTION);                     
+  glLoadIdentity ();              
+
+  for (wall & w : ws) { w.draw(); }
+
+  glColor3f(0.3, 0.3, 0.3);
+  for (wall & iw : iws) { iw.draw(); }
+  for (wall & gw : gws) { gw.draw(); }
+  glColor3f(1, 1, 1);
+
+  for (circle & c : cs) { c.draw(); }
+
+  puck.draw(); 
+  
+
 
   glutSwapBuffers();
   glutPostRedisplay ();

@@ -1,6 +1,6 @@
 CC=g++ 
 MODE = DEBUG
-CFLAGS= -pedantic -Wall -std=c++11 -pthread -DMODE_$(MODE)
+CFLAGS= -pedantic -Wall -std=c++11 -DMODE_$(MODE)
 LDFLAGS= -lGL -lGLU -lglut1
 SRCDIR=src
 EXE = cs3gc3-final
