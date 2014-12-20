@@ -117,10 +117,13 @@ void state::collideWithWalls (vector<circle> & cs, vector<wall> & ws, float m) {
 }
 
 
+
+const float diffArr [] = { 0.005, 0.02, 0.08 }; 
+
 void state::step(float m) { 
   for (int i = 0; i < cs.size(); i++) {
     cs[i].step(m);
-    if (i != playerPaddle) stepAI(m, 0.005, i, cs[i]); 
+    if (i != playerPaddle) stepAI(m, diffArr[difficulty], i, cs[i]); 
   }
 
   puck.step(m); 

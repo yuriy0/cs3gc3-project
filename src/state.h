@@ -48,6 +48,7 @@ public:
   int time = 0;
   bool gameStarted = false; 
   GLuint texture; 
+  int difficulty = 0;
 
   // OpenGL handlers 
   void keyboard (unsigned char, int, int);

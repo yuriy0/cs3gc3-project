@@ -40,12 +40,19 @@ int main(int argc, char** argv) {
   glutReshapeFunc       ([] (int a, int b)                  { st.reshape(a,b);            }); 
   glutIdleFunc          ([] ()                              { st.step();                  });
   
-    
+  
+  // New game menu
+  int diffMenu = glutCreateMenu ([] (int i) { st.difficulty = i; st.menuHandler(2); });
+  glutAddMenuEntry("Easy", 0);
+  glutAddMenuEntry("Medium", 1);
+  glutAddMenuEntry("Hard", 1);
+  
   // Main menu.
   glutCreateMenu ([] (int i) { st.menuHandler(i); });
   glutAddMenuEntry("Start game", 0);
   glutAddMenuEntry("Pause game", 1);
-  glutAddMenuEntry("New game", 2);
+  glutAddSubMenu("New game ... ", diffMenu);
+
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 
