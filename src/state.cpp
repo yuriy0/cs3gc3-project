@@ -43,6 +43,28 @@ void state::init() {
 }
 
 void state::keyboard (unsigned char a, int b, int c) { 
+
+  switch (a) {
+  case 'p':
+  case 'P':
+    gameStarted = !gameStarted; 
+    break; 
+  case 'n':
+  case 'N': 
+    newGame(); 
+    break; 
+  case '1':
+  case '2':  
+  case '3':  // Set the difficulty and make a new game
+    difficulty = (int)a - 49; // '1' == chr(49)
+    newGame(); 
+    break;
+  case 'q':
+  case 'Q':
+  case 27:
+    exit(0);
+    break;
+  }
 }
 
 void state::stepAI (float m, float diff, int i, circle & c) { 
@@ -118,7 +140,7 @@ void state::collideWithWalls (vector<circle> & cs, vector<wall> & ws, float m) {
 
 
 
-const float diffArr [] = { 0.005, 0.02, 0.08 }; 
+const float diffArr [] = { 0.005, 0.01, 0.02 }; 
 
 void state::step(float m) { 
   for (int i = 0; i < cs.size(); i++) {
@@ -245,6 +267,25 @@ void state::display() {
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, str[j]);
     }
   }
+  glPopMatrix();
+
+
+  // Text for difficulty
+  glPushMatrix();
+  glLoadIdentity();
+  glRasterPos2f(xPos, yPos);
+
+  string str; 
+  switch (difficulty) {
+  case 0: str = "Easy"; break;
+  case 1: str = "Medium"; break;
+  default: str = "Hard"; break;
+  }
+    
+  for (int i = 0; i < str.length() ; i++) {
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, str[i]);
+  }
+  yPos -= 0.05; 
   glPopMatrix();
 
   // Text for pause

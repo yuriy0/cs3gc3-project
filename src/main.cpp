@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
   int diffMenu = glutCreateMenu ([] (int i) { st.difficulty = i; st.menuHandler(2); });
   glutAddMenuEntry("Easy", 0);
   glutAddMenuEntry("Medium", 1);
-  glutAddMenuEntry("Hard", 1);
+  glutAddMenuEntry("Hard", 2);
   
   // Main menu.
   glutCreateMenu ([] (int i) { st.menuHandler(i); });
