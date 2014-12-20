@@ -20,7 +20,9 @@ vector<wall> ws;
 vector<wall> iws; 
 vector<wall> gws; 
 
-circle puck(vec2(0,0), 0.03); 
+const float puckRadius = 0.03;
+
+circle puck(vec2(0,0), puckRadius); 
 
 vec2 p1(0,0); 
 
@@ -31,6 +33,44 @@ void keyboard (unsigned char a, int b, int c) {
   // p1.y = -((float)(c - 300))/300;
 }
 
+// bool inSegment (int i, int n, float x0, float y0) { 
+  
+// }
+
+
+void stepAI (float m, float diff, int i, float n, circle & c, circle puck) { 
+  vec2 towardsPuck = puck.c - c.c ;
+  float dist = towardsPuck.magnitude(); 
+  
+  vec2 toAdd;
+
+  if (dist < 0.4) { 
+    toAdd = towardsPuck.scale((3 * diff * m) / (1 + dist)); 
+    // c.v = c.v + toAdd; 
+  } else { 
+
+    float al = 2*PI*(4*i+1)/(4.0*n);
+
+    toAdd = vec2 (cosf(al), sinf(al));
+    
+
+    toAdd = toAdd.scale(0.55); 
+
+    // Test
+    // drawPaddle(toAdd, 0.01); 
+
+    toAdd = (toAdd - c.v).scale(diff * m);
+  }
+
+  c.v = c.v + toAdd; 
+
+  // if (toAdd.x < 0 && toAdd.y < 0) { 
+  //   c.v = c.v - toAdd; 
+  // } else {
+  //   c.v = c.v + toAdd; 
+  // }
+
+}
 
 void mouseMoved (int a, int b) {
 
@@ -39,8 +79,8 @@ void mouseMoved (int a, int b) {
 
 
   if (lmbPressed) {
-    cs[0].v.x += 0.05 * dx;
-    cs[0].v.y += 0.05 * dy;
+    cs[0].v.x += 0.07 * dx;
+    cs[0].v.y += 0.07 * dy;
 
   }
 
@@ -93,7 +133,8 @@ void specialKey (int key, int b, int c) {
   // }
 }
 
-void collideWithWalls (vector<circle> & cs, vector<wall> & ws, float m) { 
+bool collideWithWalls (vector<circle> & cs, vector<wall> & ws, float m) {
+  boolean r = false;
   for (int j = 0; j < cs.size(); j++) { 
     for (int i = 0; i < ws.size(); i++) { 
       vec2 o;
@@ -108,10 +149,12 @@ void collideWithWalls (vector<circle> & cs, vector<wall> & ws, float m) {
   	cs[j].v = vel;
 
   	cs[j].step(m);
+	r = true;
   	break; 
       } 
     }
   }
+  return r; 
 }
 
 void display() { 
@@ -153,6 +196,11 @@ void display() {
   for (int i = 1; i < cs.size(); i++) {
     cs[i].draw(); 
     cs[i].step(m);
+
+// void stepAI (float m, float diff, int i, circle & c, circle puck) { 
+
+    stepAI(m, 0.005, i, 3, cs[i], puck); 
+
   }
 
   puck.draw(); 
@@ -189,10 +237,15 @@ void display() {
   collideWithWalls(cs, iws, m); 
   collideWithWalls(cs, gws, m); 
   
-  // vector<circle> puck_; 
-  // puck_.push_back(puck);
+  vector<wall> gwsC (gws); 
 
-  // collideWithWalls(puck_, ws, m);
+  vector<circle> puck_; 
+  puck_.push_back(puck);
+
+  if (collideWithWalls(puck_, gws, m)) { 
+    puck = circle(vec2(0,0), puckRadius);
+    puck.m = 0.3; 
+  }
   
 
   for (circle & c : cs) { 
@@ -209,7 +262,7 @@ void display() {
 int main(int argc, char** argv) {
   wall::genInitial(3, 0.8, 0.05, 0.2, cs, ws, iws, gws); 
 
-  // cs.push_back(circle(vec2(0, 0)), 0.01); 
+  puck.m = 0.3; 
 
   // OpenGL/glut setup
   glutInit(&argc, argv);		
