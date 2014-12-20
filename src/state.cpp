@@ -11,11 +11,6 @@ using namespace std;
 
 state::state(int n) : numPlayers(n) { 
   init(); 
-  
-  // texture = loadTextureRAW("../images/Ice.rgb", true); 
-  // texture = loadTextureRAW("texture.raw", true); 
-  // texture = loadTextureRAW("texture.raw", true); 
-  // printf ("texture %d \n", texture); 
 }
 
 state::state() : state(3) { } 
@@ -215,10 +210,11 @@ void state::reshape(int w, int h) {
 }
 
 // Values for the lights. 
-const float ambientLight[] =  { 0.5 , 0.5 , 0.5 , 1 };
-const float diffuseLight[] =  { 0.3 , 0.3 , 0.3 , 1 }; 
-const float specularLight[] = { 0.4 , 0.4 , 0.4 , 1 };
-const float emissionLight[] = { 0.2 , 0.2 , 0.2 , 1 };
+const float ambientLight[] =  { 0.2 , 0.2 , 0.2 , 1 };
+const float diffuseLight[] =  { 0.6 , 0.6 , 0.6 , 1 }; 
+const float specularLight[] = { 0.0 , 0.0 , 0.0 , 1 };
+const float emissionLight[] = { 0.0 , 0.0 , 0.0 , 1 };
+// const float position[] = { 0, 0 , - 40, 1};
 const float position[] = {0,0, -1, 1};
 
 void state::setupLight (int n) { 
@@ -231,11 +227,7 @@ void state::setupLight (int n) {
   glLightfv(GL_LIGHT0 + n, GL_SPECULAR, specularLight);
   glLightfv(GL_LIGHT0 + n, GL_EMISSION, emissionLight);
 
-  // Position the light at the position corresponding to that light in
-  // the state.
   glPushMatrix(); 
-  // glTranslatef(dxl[n-1], dyl[n-1], 0); 
-
   glLightfv(GL_LIGHT0 + n, GL_POSITION, position);
   glPopMatrix(); 
 }
@@ -342,7 +334,7 @@ void state::display() {
     float al = i * PI / numPlayers; 
     float xc = fieldRadius * cosf(al);
     float yc = fieldRadius * sinf(al);
-    glTexCoord3d(xc, yc, -0.05); glVertex3d(xc, yc, -0.05); 
+    glTexCoord3d(-xc, yc, -0.05); glVertex3d(xc, yc, -0.05); 
   }
   glEnd();
 

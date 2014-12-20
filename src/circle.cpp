@@ -25,7 +25,17 @@ circle::circle (CircleType ty_) : ty(ty_) {
 void circle::draw () { 
   glPushMatrix();
   glTranslatef(c.x, c.y, 0);
+
+  if (ty == Paddle) { 
+    glPushMatrix();
+    glTranslatef(0, 0, 0.5*r);
+    glScalef(0.5, 0.5, 1); 
+    glutSolidSphere(r, 20, 20);
+    glPopMatrix(); 
+  }
+
   glutSolidSphere(r, 20, 20);
+
   glPopMatrix(); 
 }
 

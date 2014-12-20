@@ -12,6 +12,17 @@ state st;
 
 int main(int argc, char** argv) {
 
+  // Read and print the readme file.
+  FILE *file = fopen(README, "r");
+
+  if (file) { 
+    while(1) {
+      int c = fgetc(file);
+      if (feof(file)) break;
+      printf("%c", c);
+    }
+  }
+
   // OpenGL/glut setup
   glutInit(&argc, argv);		
   glutInitDisplayMode(GLUT_ALPHA | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE | GLUT_DEPTH );
