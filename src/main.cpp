@@ -42,34 +42,17 @@ void stepAI (float m, float diff, int i, float n, circle & c, circle puck) {
   vec2 towardsPuck = puck.c - c.c ;
   float dist = towardsPuck.magnitude(); 
   
-  vec2 toAdd;
+  vec2 toAdd = vec2(0,0);
 
   if (dist < 0.4) { 
     toAdd = towardsPuck.scale((3 * diff * m) / (1 + dist)); 
-    // c.v = c.v + toAdd; 
   } else { 
-
     float al = 2*PI*(4*i+1)/(4.0*n);
-
     toAdd = vec2 (cosf(al), sinf(al));
-    
-
     toAdd = toAdd.scale(0.55); 
-
-    // Test
-    // drawPaddle(toAdd, 0.01); 
-
-    toAdd = (toAdd - c.v).scale(diff * m);
+    toAdd = (toAdd - c.c).scale(diff * m);
   }
-
   c.v = c.v + toAdd; 
-
-  // if (toAdd.x < 0 && toAdd.y < 0) { 
-  //   c.v = c.v - toAdd; 
-  // } else {
-  //   c.v = c.v + toAdd; 
-  // }
-
 }
 
 void mouseMoved (int a, int b) {
