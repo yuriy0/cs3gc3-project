@@ -26,7 +26,7 @@ const float fieldRadius = 0.8;
 const float frictionCoefficient = 0.09; 
 const float gateSize = 0.2; 
 
-const int initialScore = 20; 
+const int initialScore = 1; 
 
 class state { 
 public:

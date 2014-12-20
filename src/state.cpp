@@ -42,7 +42,6 @@ void state::stepAI (float m, float diff, int i, circle & c) {
   int n = numPlayers; 
   vec2 towardsPuck = puck.c - c.c ;
   float dist = towardsPuck.magnitude(); 
-  
   vec2 toAdd = vec2(0,0);
 
   if (dist < 0.4) { 
@@ -58,7 +57,6 @@ void state::stepAI (float m, float diff, int i, circle & c) {
 
 void state::mouseMoved (int a, int b) {
   if (!gameStarted) return; 
-
   float dx = (a - p1.x) / width;
   float dy = (p1.y - b) / height;
 
@@ -77,7 +75,8 @@ void state::passiveMouseMoved (int b, int c) {
 }
 
 void state::mousePressed (int button, int state, int x, int y) {
-  if (button == GLUT_LEFT_BUTTON && gameStarted) {
+  if (!gameStarted) return; 
+  if (button == GLUT_LEFT_BUTTON) {
     lmbPressed = state == GLUT_DOWN; 
   } 
 }
@@ -150,13 +149,13 @@ void state::step(float m) {
 
 
 void state::step() { 
-  if (!gameStarted) return; 
-
   // Compute the time since the last invocation of step
   int t = glutGet(GLUT_ELAPSED_TIME);
   int dt_ = t - time;
   float dt = 0.001 * (float)dt_; // The time in seconds. 
   time = t; 
+
+  if (!gameStarted) return; 
   
   float m = 50 * dt; 
   int steps = 4; 
@@ -191,20 +190,35 @@ void state::display() {
   glViewport (0, 0, sq, sq);      
 
   // Text for score etc 
+  float yPos = 0.95;
   glPushMatrix();
   glLoadIdentity();
 
   for (int i = 0; i < numPlayers; i++) {
-    glRasterPos2f(0.95, 0.95 - i * 0.05);
+    glRasterPos2f(0.95, yPos); yPos -= 0.05;
     ostringstream s;
     s << i << " : " << score[i];  
     string str = s.str();
 
-    for (int i = 0; i < str.length() ; i++) {
-      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, str[i]);
+    for (int j = 0; j < str.length() ; j++) {
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, str[j]);
     }
   }
   glPopMatrix();
+
+  // Text for pause
+  if (!gameStarted) {
+    glPushMatrix();
+    glLoadIdentity();
+    glRasterPos2f(0.95, yPos);
+
+    string str = "Paused";
+    
+    for (int i = 0; i < str.length() ; i++) {
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, str[i]);
+    }
+    glPopMatrix();
+  }
 
   // reset model view 
   glMatrixMode (GL_MODELVIEW);                     
