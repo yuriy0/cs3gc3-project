@@ -1,9 +1,15 @@
 #include "wall.h"
 #include "drawing.h"
+#include "circle.h"
 #include "stdio.h"
+#include "math.h"
+#include "utils.h"
 #include <GL/gl.h> 
 #include <GL/glu.h> 
 #include <GL/glut.h> 
+#include <vector>
+
+using namespace std;
 
 wall::wall(vec2 p0_, vec2 p1_) : p0(p0_), p1(p1_) { }
 wall::wall(float a, float b, float c, float d) : p0(a,b), p1(c,d) { } 
@@ -50,5 +56,46 @@ bool wall::collision (vec2 c, float r, vec2 & o) {
   else {
     o = m; 
     return true; 
+  }
+}
+
+
+void wall::genInitial (int i, float rField, float rPaddle, float goalSize, 
+		       vector<circle> & cs, vector<wall> & ws, vector<wall> & iws, vector<wall> & gws) { 
+  vec2 points[2*i+1]; 
+  float gR = 0.5*goalSize; 
+
+  // Compute the angles 
+  for (int k = 0; k < 2*i+1; k++) { 
+    float al = PI*k/i;
+    points[k] = vec2(rField * cosf(al), rField * sinf(al)); 
+  }
+
+  // Compute the data. 
+  for (int k = 0; k < i; k++) {
+    vec2 p0 = points[2*k  ];
+    vec2 p1 = points[2*k+1];
+    vec2 p2 = points[2*k+2];
+    vec2 m0 = (p0 + p1).scale(0.5); 
+    vec2 m1 = (p1 + p2).scale(0.5);
+    vec2 g0 = p0 + (p1 - p0).scale(0.5 - gR);
+    vec2 g1 = p0 + (p1 - p0).scale(0.5 + gR);
+
+    wall solidWall (p1, p2) ; 
+    wall toMiddle (m1, vec2(0,0)); 
+    circle circ (m0.scale(0.8), rPaddle); 
+
+    wall side1(p0,g0); 
+    wall side2(g1,p1);
+
+    wall gateWall (g0, g1);
+
+    cs.push_back(circ);
+
+    iws.push_back(toMiddle);
+    gws.push_back(gateWall);
+    ws.push_back(side1);
+    ws.push_back(side2); 
+    ws.push_back(solidWall);
   }
 }

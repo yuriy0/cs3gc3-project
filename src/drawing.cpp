@@ -19,7 +19,7 @@ void drawLineSegment(vec2 a, vec2 b) {
 
 
 void drawPaddle(vec2 c, float r) { 
-  glBegin(GL_LINE_LOOP);
+  glBegin(GL_POLYGON);
   for (int i = 0; i < 32; i++) { 
     float alpha = i*PI*2/32; 
     glVertex3f(r*cosf(alpha) + c.x, r*sinf(alpha) + c.y, 0); 
